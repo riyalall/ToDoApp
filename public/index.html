@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+    <head>
+        <title>To Do App</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="column">
+                <div id="leftform" >
+                    <h1 style="padding-left: 10px;">
+                        <strong>TASK LIST</strong>
+                    </h1>
+                    <p>Add tasks to your list by typing to the right and pressing enter.
+                            You may then view pending tasks below.
+                    </p>
+                    <br>
+                    <div id="task"> 
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+            <div class="column">
+                <div id="rightform">
+                    <textarea id="NewTask" rows="15" cols="90" placeholder="I need to...."></textarea>
+                    <br><br>
+                    <input id="images" name="taskImage" type="file"/>
+                    <br><br>
+                    <div id="addTask" style="padding-right: 20%;text-align: right;" >
+                        <button type="button" style="height: 50px;width: 200px;font-size: 20px;" >Add Task</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="script.js" type="text/javascript"></script>
+    </body>
+</html>
