@@ -38,116 +38,110 @@ app.use(express.json())
 
 app.get("/data", function(req, res)
 {
-    fs.readFile("./public/data.txt", "utf-8",function(err_r, f_data)
-    {
-        if(err_r){
-            res.end(err_r)
-        }else{
-        res.end(f_data);
-        }
+    readTasks(function(tasks){
+        res.send(tasks);
     })
 })
 
 app.post('/imgupload', upload.single("taskImage"), (req, res) => {
     details = req.body;
     details.image = req.file.filename;
-    res.send("hi")
+    res.send("uploaded")
 })
 
 app.post('/upload', function(req, res)
 {
-    fs.readFile("./public/data.txt", "utf-8",function(err_r, f_data)
-    {
-        if(err_r){
-            res.end(err_r)
-        }else{
-            f_data = f_data.length ? JSON.parse(f_data) : [];
-            f_data.push(details)
-            fs.writeFile("./public/data.txt", JSON.stringify(f_data), function(err, data)
+    readTasks(function(f_data){
+        f_data.push(details)
+        saveTasks(JSON.stringify(f_data), function(err)
+        {
+            if(err)
             {
-                if(err)
-                {
-                    res.end("err")
-                }
-                else
-                {
-                    res.end(JSON.stringify(details));
-                }
-            })
-        }
+                res.send("err")
+            }
+            else
+            {
+                res.send(JSON.stringify(details));
+            }
+        })
     })
 })
 
 app.post('/update', function(req, res)
 {
-    fs.readFile("./public/data.txt", "utf-8", function(err_r, f_data)
-    {
-        if(err_r){
-            res.end(err_r)
-        }else{
-            f_data = f_data.length ? JSON.parse(f_data) : [];
-            var data=req.body;
-            for(var x in f_data){
-                if(f_data[x].Id==data.Id){
-                    if(f_data[x].Status=='true'){
-                        f_data[x].Status='false';
-                    }else{
-                        f_data[x].Status='true';
-                    }
-                    break;
+    readTasks(function(f_data){
+        var data=req.body;
+        for(var x in f_data){
+            if(f_data[x].Id==data.Id){
+                if(f_data[x].Status=='true'){
+                    f_data[x].Status='false';
+                }else{
+                    f_data[x].Status='true';
                 }
+                break;
             }
-            fs.writeFile("./public/data.txt", JSON.stringify(f_data), function(err, data)
-            {
-                if(err)
-                {
-                    res.end("err")
-                }
-                else
-                {
-                    res.end()
-                }
-            })
         }
+        saveTasks(JSON.stringify(f_data), function(err)
+        {
+            if(err)
+            {
+                res.end("err")
+            }
+            else
+            {
+                res.end()
+            }
+        })
     })
 })
 
 app.post('/delete', function(req, res)
 {
-    fs.readFile("./public/data.txt", "utf-8",function(err_r, f_data)
-    {
-        if(err_r){
-            res.end(err_r)
-        }else{
-            f_data = f_data.length ? JSON.parse(f_data) : [];
-            var data=req.body;
-            for(var x in f_data){
-                if(f_data[x].Id==data.Id){
-                    index=x;
-                    loc = './public/images/'+f_data[x].image;
-                    fs.unlink(loc, function (err) {
-                        if (err) throw err;
-                        console.log('File deleted!');
-                    });
-                    f_data.splice(x,1)
-                    break;
-                }
+   readTasks(function(f_data){
+        var data=req.body;
+        for(var x in f_data){
+            if(f_data[x].Id==data.Id){
+                index=x;
+                loc = './public/images/'+f_data[x].image;
+                fs.unlink(loc, function (err) {
+                    if (err) throw err;
+                    console.log('File deleted!');
+                });
+                f_data.splice(x,1)
+                break;
             }
-            
-            fs.writeFile("./public/data.txt", JSON.stringify(f_data), function(err, data)
-            {
-                if(err)
-                {
-                    res.end("err")
-                }
-                else
-                {
-                    res.end()
-                }
-            })
         }
+        saveTasks(JSON.stringify(f_data), function(err)
+        {
+            if(err)
+            {
+                res.end("err")
+            }
+            else
+            {
+                res.end()
+            }
+        })
     })
 })
+
+function readTasks(callback)
+{
+    fs.readFile("./data.txt","utf-8", function(err, data)
+    {
+        data  = data ? JSON.parse(data) : [];
+
+        callback(data);
+    })
+}
+
+function saveTasks(data,callback)
+{
+    fs.writeFile("./data.txt", data, function(err)
+    {
+        callback(err);
+    })
+}
 
 
 app.listen(port, () => {
